@@ -43,7 +43,7 @@ namespace util
 		omni_map() : 
 			m_roots{ nullptr } {}
 
-		void insert(T&&... t) {
+		void emplace(T&&... t) {
 			node* n = m_nodepool.construct(std::forward<T>(t)...);
 			insert_node<0>(n);
 		}
