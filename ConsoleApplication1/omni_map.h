@@ -47,13 +47,13 @@ namespace util
 			node* n = m_nodepool.construct(std::forward<T>(t)...);
 			insert_node<0>(n);
 		}
-		template <size_t I, typename B>
-		iterator<I> find(const B& b) {
+		template <size_t I, typename A>
+		iterator<I> find(const A& value) {
 			node* curr = m_roots[I];
 			while (curr)
-				if (b < std::get<I>(curr->values))
+				if (value < std::get<I>(curr->values))
 					curr = curr->branches[I].left;
-				else if (b > std::get<I>(curr->values))
+				else if (value > std::get<I>(curr->values))
 					curr = curr->branches[I].right;
 				else
 					return iterator<I>(curr);
