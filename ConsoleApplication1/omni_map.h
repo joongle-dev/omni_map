@@ -23,7 +23,7 @@ namespace util
 		struct node {
 			node(T&&... t) :
 				values(t...) {}
-			std::tuple<T...> values;
+			tuple_t values;
 			branch branches[num_element];
 		};
 		
@@ -33,10 +33,10 @@ namespace util
 		public:
 			iterator(node* n = nullptr) :
 				curr(n) {}
-			const std::tuple<T...>& operator*() {
+			const tuple_t& operator*() {
 				return curr->values;
 			}
-			const std::tuple<T...>& operator->() {
+			const tuple_t& operator->() {
 				return curr->values;
 			}
 		private:
