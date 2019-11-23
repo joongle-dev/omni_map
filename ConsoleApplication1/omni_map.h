@@ -8,6 +8,10 @@ namespace util
 	{
 		static constexpr size_t num_element = sizeof...(T);
 
+		using tuple_t = std::tuple<T...>;
+		template <size_t I>
+		using element_t = typename std::tuple_element_t<I, tuple_t>;
+
 		struct node;
 		struct branch {
 			branch() : 
@@ -47,8 +51,8 @@ namespace util
 			node* n = m_nodepool.construct(std::forward<T>(t)...);
 			insert_node<0>(n);
 		}
-		template <size_t I, typename A>
-		iterator<I> find(const A& value) {
+		template <size_t I>
+		iterator<I> find(const element_t<I>& value) {
 			node* curr = m_roots[I];
 			while (curr)
 				if (value < std::get<I>(curr->values))
