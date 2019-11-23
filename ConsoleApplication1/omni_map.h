@@ -9,10 +9,12 @@ namespace util
 		static constexpr size_t num_element = sizeof...(T);
 
 		using tuple_t = std::tuple<T...>;
+
 		template <size_t I>
 		using element_t = typename std::tuple_element_t<I, tuple_t>;
 
 		struct node;
+
 		struct branch {
 			branch() : 
 				left(nullptr), 
@@ -20,6 +22,7 @@ namespace util
 			node* left;
 			node* right;
 		};
+
 		struct node {
 			node(T&&... t) :
 				values(t...) {}
@@ -30,6 +33,7 @@ namespace util
 	public:
 		template <size_t I>
 		class iterator {
+			friend class omni_map<T...>;
 		public:
 			iterator(node* n = nullptr) :
 				curr(n) {}
@@ -51,6 +55,7 @@ namespace util
 			node* n = m_nodepool.construct(std::forward<T>(t)...);
 			insert_node<0>(n);
 		}
+
 		template <size_t I>
 		iterator<I> find(const element_t<I>& value) {
 			node* curr = m_roots[I];
@@ -76,6 +81,7 @@ namespace util
 			*curr = n;
 			insert_node<I + 1>(n);
 		}
+
 		template <>
 		void insert_node<num_element>(node* n) {}
 
