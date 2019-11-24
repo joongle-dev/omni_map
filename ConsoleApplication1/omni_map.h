@@ -134,9 +134,9 @@ namespace util
 					*curr = n->branches[I].left;
 			else
 				if (n->branches[I].right)
-					*curr = nullptr;
-				else
 					*curr = n->branches[I].right;
+				else
+					*curr = nullptr;
 			remove_node<I + 1>(n);
 		}
 
