@@ -12,7 +12,11 @@ int main()
 	test_map.emplace(4, "four");
 	test_map.emplace(5, "five");
 	auto it0 = test_map.find<0>(4);
-	std::cout << std::get<0>(*it0) << " " << std::get<1>(*it0) << std::endl;
 	auto it1 = test_map.find<1>("seven");
+	std::cout << std::get<0>(*it0) << " " << std::get<1>(*it0) << std::endl;
 	std::cout << std::get<0>(*it1) << " " << std::get<1>(*it1) << std::endl;
+	test_map.erase(it0);
+	it0 = test_map.find<0>(4);
+	it1 = test_map.find<1>("four");
+	std::cout << (it0 == test_map.end<0>()) << std::endl;
 }
