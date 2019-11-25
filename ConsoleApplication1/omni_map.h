@@ -31,6 +31,7 @@ namespace util
 		};
 		
 	public:
+		template <size_t I>
 		class iterator {
 			friend class omni_map<T...>;
 		public:
@@ -42,14 +43,11 @@ namespace util
 			const tuple_t& operator->() {
 				return curr->values;
 			}
-			bool operator==(const iterator& r) {
+			bool operator==(const iterator<I>& r) {
 				return curr == r.curr;
 			}
-			bool operator!=(const iterator& r) {
+			bool operator!=(const iterator<I>& r) {
 				return curr != r.curr;
-			}
-			operator bool() const {
-				return curr;
 			}
 		private:
 			node* curr;
@@ -65,7 +63,7 @@ namespace util
 		}
 
 		template <size_t I>
-		iterator find(const element_t<I>& value) {
+		iterator<I> find(const element_t<I>& value) {
 			node* curr = m_roots[I];
 			while (curr)
 				if (value < std::get<I>(curr->values))
@@ -73,13 +71,27 @@ namespace util
 				else if (value > std::get<I>(curr->values))
 					curr = curr->branches[I].right;
 				else
-					return iterator(curr);
-			return iterator();
+					return iterator<I>(curr);
+			return iterator<I>();
 		}
 
-		void erase(iterator it) {
+		template <size_t I>
+		void erase(iterator<I> it) {
 			remove_node<0>(it.curr);
 			m_nodepool.destroy(it.curr);
+		}
+
+		template <size_t I>
+		iterator<I> begin() {
+			node* curr = m_roots[I];
+			while (curr->branches[I].left)
+				curr = curr->branches[I].left;
+			return iterator<I>(curr);
+		}
+
+		template <size_t I>
+		iterator<I> end() {
+			return iterator<I>();
 		}
 
 	private:

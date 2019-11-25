@@ -27,10 +27,10 @@ int main()
 	test_map.emplace(21, "twenty_one(1)");
 
 	it0 = test_map.find<0>(25);
-	std::cout << (it0  ? "true" : "false") << std::endl;
+	std::cout << (it0 == test_map.end<0>() ? "true" : "false") << std::endl;
 	test_map.erase(it0);
 	it0 = test_map.find<0>(25);
-	std::cout << (it0  ? "true" : "false") << std::endl;
+	std::cout << (it0 == test_map.end<0>() ? "true" : "false") << std::endl;
 
 	it0 = test_map.find<0>(21);
 	it1 = test_map.find<1>("sixteen");
