@@ -17,8 +17,10 @@ namespace util
 
 		struct branch {
 			branch() : 
+				parent(nullptr),
 				left(nullptr), 
 				right(nullptr) {}
+			node* parent;
 			node* left;
 			node* right;
 		};
@@ -48,6 +50,29 @@ namespace util
 			}
 			bool operator!=(const iterator<I>& r) {
 				return curr != r.curr;
+			}
+			void operator++(int) {
+				if (curr->branches[I].right) {
+					curr = curr->branches[I].right;
+					while (curr->branches[I].left)
+						curr = curr->branches[I].left;
+				} else {
+					while (curr->branches[I].parent && curr != curr->branches[I].parent->branches[I].left)
+						curr = curr->branches[I].parent;
+					curr = curr->branches[I].parent;
+				}
+			}
+			void operator--(int) {
+				if (curr->branches[I].left) {
+					curr = curr->branches[I].left;
+					while (curr->branches[I].right)
+						curr = curr->branches[I].right;
+				}
+				else {
+					while (curr->branches[I].parent && curr != curr->branches[I].parent->branches[I].right)
+						curr = curr->branches[I].parent;
+					curr = curr->branches[I].parent;
+				}
 			}
 		private:
 			node* curr;
@@ -99,6 +124,7 @@ namespace util
 		void insert_node(node* n) {
 			node** curr = &m_roots[I];
 			while (*curr) {
+				n->branches[I].parent = *curr;
 				if (std::get<I>(n->values) <= std::get<I>((*curr)->values))
 					curr = &(*curr)->branches[I].left;
 				else
@@ -114,11 +140,12 @@ namespace util
 		template <size_t I>
 		void remove_node(node* n) {
 			node** curr = &m_roots[I];
-			while (*curr != n)
-				if (std::get<I>(n->values) <= std::get<I>((*curr)->values))
-					curr = &(*curr)->branches[I].left;
+			node* parent = n->branches[I].parent;
+			if (n->branches[I].parent)
+				if (n->branches[I].parent->branches[I].left == n)
+					curr = &n->branches[I].parent->branches[I].left;
 				else
-					curr = &(*curr)->branches[I].right;
+					curr = &n->branches[I].parent->branches[I].right;
 			if (n->branches[I].left)
 				if (n->branches[I].right) {
 					node* left = n->branches[I].left;
@@ -129,12 +156,17 @@ namespace util
 					while (max_left->branches[I].left)
 						max_left = max_left->branches[I].left;
 					max_left->branches[I].left = left;
+					(*curr)->branches[I].parent = parent;
 				}
-				else
+				else {
 					*curr = n->branches[I].left;
+					(*curr)->branches[I].parent = parent;
+				}
 			else
-				if (n->branches[I].right)
+				if (n->branches[I].right) {
 					*curr = n->branches[I].right;
+					(*curr)->branches[I].parent = parent;
+				}
 				else
 					*curr = nullptr;
 			remove_node<I + 1>(n);

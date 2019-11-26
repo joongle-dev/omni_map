@@ -36,4 +36,14 @@ int main()
 	it1 = test_map.find<1>("sixteen");
 	std::cout << std::get<0>(*it0) << " " << std::get<1>(*it0) << std::endl;
 	std::cout << std::get<0>(*it1) << " " << std::get<1>(*it1) << std::endl;
+	
+	std::cout << std::endl;
+
+	for (auto it = test_map.begin<0>(); it != test_map.end<0>(); it++)
+		std::cout << std::get<0>(*it) << "\t" << std::get<1>(*it) << std::endl;
+
+	std::cout << std::endl;
+	
+	for (auto it = test_map.find<0>(23); it != test_map.begin<0>(); it--)
+		std::cout << std::get<0>(*it) << "\t" << std::get<1>(*it) << std::endl;
 }
