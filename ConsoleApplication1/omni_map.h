@@ -31,7 +31,6 @@ namespace util
 		};
 		
 	public:
-		template <size_t I>
 		class iterator {
 			friend class omni_map<T...>;
 		public:
@@ -43,11 +42,14 @@ namespace util
 			const tuple_t& operator->() {
 				return curr->values;
 			}
-			bool operator==(const iterator<I>& r) {
+			bool operator==(const iterator& r) {
 				return curr == r.curr;
 			}
-			bool operator!=(const iterator<I>& r) {
+			bool operator!=(const iterator& r) {
 				return curr != r.curr;
+			}
+			operator bool() const {
+				return curr;
 			}
 		private:
 			node* curr;
@@ -62,8 +64,13 @@ namespace util
 			insert_node<0>(n);
 		}
 
+		void erase(iterator it) {
+			remove_node<0>(it.curr);
+			m_nodepool.destroy(it.curr);
+		}
+
 		template <size_t I>
-		iterator<I> find(const element_t<I>& value) {
+		iterator find(const element_t<I>& value) {
 			node* curr = m_roots[I];
 			while (curr)
 				if (value < std::get<I>(curr->values))
@@ -71,39 +78,48 @@ namespace util
 				else if (value > std::get<I>(curr->values))
 					curr = curr->branches[I].right;
 				else
-					return iterator<I>(curr);
-			return iterator<I>();
+					return iterator(curr);
+			return iterator();
 		}
 
 		template <size_t I>
-		void erase(iterator<I> it) {
-			remove_node<0>(it.curr);
-			m_nodepool.destroy(it.curr);
-		}
-
-		template <size_t I>
-		iterator<I> begin() {
+		void neighbor(iterator& left, iterator& right, const element_t<I>& value) {
 			node* curr = m_roots[I];
-			while (curr->branches[I].left)
-				curr = curr->branches[I].left;
-			return iterator<I>(curr);
+			while (curr)
+				if (value < std::get<I>(curr->values)) {
+					right.curr = curr;
+					curr = curr->branches[I].left;
+				}
+				else if (value > std::get<I>(curr->values)) {
+					left.curr = curr;
+					curr = curr->branches[I].right;
+				}
 		}
 
 		template <size_t I>
-		iterator<I> end() {
-			return iterator<I>();
+		iterator lower_bound(const element_t<I>& value) {
+			node* res = nullptr;
+			node* curr = m_roots[I];
+			while (curr) {
+				if (value <= std::get<I>(curr->values)) {
+					res = curr;
+					curr = curr->branches[I].left;
+				}
+				else if (value > std::get<I>(curr->values))
+					curr = curr->branches[I].right;
+			}
+			return iterator(res);
 		}
 
 	private:
 		template <size_t I>
 		void insert_node(node* n) {
 			node** curr = &m_roots[I];
-			while (*curr) {
+			while (*curr)
 				if (std::get<I>(n->values) <= std::get<I>((*curr)->values))
 					curr = &(*curr)->branches[I].left;
 				else
 					curr = &(*curr)->branches[I].right;
-			}
 			*curr = n;
 			insert_node<I + 1>(n);
 		}

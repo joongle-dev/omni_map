@@ -26,14 +26,22 @@ int main()
 	test_map.emplace(21, "twenty_one");
 	test_map.emplace(21, "twenty_one(1)");
 
-	it0 = test_map.find<0>(25);
-	std::cout << (it0 == test_map.end<0>() ? "true" : "false") << std::endl;
-	test_map.erase(it0);
-	it0 = test_map.find<0>(25);
-	std::cout << (it0 == test_map.end<0>() ? "true" : "false") << std::endl;
+	//it0 = test_map.find<0>(25);
+	//std::cout << (it0 ? "true" : "false") << std::endl;
+	//test_map.erase(it0);
+	//it0 = test_map.find<0>(25);
+	//std::cout << (it0 ? "true" : "false") << std::endl;
 
 	it0 = test_map.find<0>(21);
 	it1 = test_map.find<1>("sixteen");
 	std::cout << std::get<0>(*it0) << " " << std::get<1>(*it0) << std::endl;
 	std::cout << std::get<0>(*it1) << " " << std::get<1>(*it1) << std::endl;
+
+	std::cout << std::endl;
+
+	util::omni_map<int, std::string>::iterator left;
+	util::omni_map<int, std::string>::iterator right;
+	test_map.neighbor<0>(left, right, 10);
+	std::cout << std::get<0>(*left) << " " << std::get<1>(*left) << std::endl;
+	std::cout << std::get<0>(*right) << " " << std::get<1>(*right) << std::endl;
 }
