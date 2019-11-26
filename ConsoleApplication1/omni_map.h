@@ -45,6 +45,9 @@ namespace util
 			const tuple_t& operator->() {
 				return curr->values;
 			}
+			operator bool() const {
+				return curr;
+			}
 			bool operator==(const iterator<I>& r) {
 				return curr == r.curr;
 			}
@@ -88,6 +91,12 @@ namespace util
 		}
 
 		template <size_t I>
+		void erase(iterator<I> it) {
+			remove_node<0>(it.curr);
+			m_nodepool.destroy(it.curr);
+		}
+
+		template <size_t I>
 		iterator<I> find(const element_t<I>& value) {
 			node* curr = m_roots[I];
 			while (curr)
@@ -101,9 +110,31 @@ namespace util
 		}
 
 		template <size_t I>
-		void erase(iterator<I> it) {
-			remove_node<0>(it.curr);
-			m_nodepool.destroy(it.curr);
+		iterator<I> lower_bound(const element_t<I>& value) {
+			node* bound = nullptr;
+			node* curr = m_roots[I];
+			while (curr)
+				if (value <= std::get<I>(curr->values)) {
+					bound = curr;
+					curr = curr->branches[I].left;
+				}
+				else
+					curr = curr->branches[I].right;
+			return iterator<I>(bound);
+		}
+
+		template <size_t I>
+		iterator<I> upper_bound(const element_t<I>& value) {
+			node* bound = nullptr;
+			node* curr = m_roots[I];
+			while (curr)
+				if (value < std::get<I>(curr->values)) {
+					bound = curr;
+					curr = curr->branches[I].left;
+				}
+				else
+					curr = curr->branches[I].right;
+			return iterator<I>(bound);
 		}
 
 		template <size_t I>
