@@ -24,8 +24,9 @@ namespace util
 		};
 
 		struct node {
-			node(T&&... t) :
-				values(t...) {}
+			template <typename... Args>
+			node(Args&&... args) :
+				values(std::forward<Args>(args)...) {}
 			tuple_t values;
 			branch branches[num_element];
 		};
@@ -63,8 +64,9 @@ namespace util
 		omni_map() : 
 			m_roots{ nullptr } {}
 
-		void emplace(T&&... t) {
-			node* n = m_nodepool.construct(std::forward<T>(t)...);
+		template <typename... Args>
+		void emplace(Args&&... args) {
+			node* n = m_nodepool.construct(std::forward<Args>(args)...);
 			insert_node<0>(n);
 		}
 
