@@ -51,6 +51,10 @@ namespace util
 			operator bool() const {
 				return curr;
 			}
+			template <size_t I>
+			const element_t<I>& get() {
+				return std::get<I>(curr->values);
+			}
 		private:
 			node* curr;
 		};
@@ -83,32 +87,43 @@ namespace util
 		}
 
 		template <size_t I>
-		void neighbor(iterator& left, iterator& right, const element_t<I>& value) {
+		void adjacent(iterator& prev, iterator& next, const element_t<I>& value) {
 			node* curr = m_roots[I];
 			while (curr)
 				if (value < std::get<I>(curr->values)) {
-					right.curr = curr;
+					next.curr = curr;
 					curr = curr->branches[I].left;
-				}
-				else if (value > std::get<I>(curr->values)) {
-					left.curr = curr;
+				} 
+				else {
+					prev.curr = curr;
 					curr = curr->branches[I].right;
 				}
 		}
 
 		template <size_t I>
 		iterator lower_bound(const element_t<I>& value) {
-			node* res = nullptr;
+			node* bound = nullptr;
 			node* curr = m_roots[I];
-			while (curr) {
+			while (curr)
 				if (value <= std::get<I>(curr->values)) {
-					res = curr;
+					bound = curr;
 					curr = curr->branches[I].left;
-				}
-				else if (value > std::get<I>(curr->values))
+				} else
 					curr = curr->branches[I].right;
-			}
-			return iterator(res);
+			return iterator(bound);
+		}
+
+		template <size_t I>
+		iterator upper_bound(const element_t<I>& value) {
+			node* bound = nullptr;
+			node* curr = m_roots[I];
+			while (curr)
+				if (value < std::get<I>(curr->values)) {
+					bound = curr;
+					curr = curr->branches[I].left;
+				} else
+					curr = curr->branches[I].right;
+			return iterator(bound);
 		}
 
 	private:
